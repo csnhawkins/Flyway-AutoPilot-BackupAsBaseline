@@ -96,8 +96,16 @@ jobs:
         if: env.publishArtifacts == 'true'
         uses: actions/upload-artifact@v4
         with: 
-          name: flyway-build-artifact
-          path: Artifact_Files/Migration/
+          name: flyway-build-artifact-${{ github.run_number }}
+          path: |
+              !${{ GITHUB.WORKSPACE }}\flyway-*\**\*
+              !${{ GITHUB.WORKSPACE }}\.git\**\*
+              !${{ GITHUB.WORKSPACE }}\.git*\**\*
+              ${{ GITHUB.WORKSPACE }}\**\schema-model\**\*
+              ${{ GITHUB.WORKSPACE }}\**\migrations\**\*
+              ${{ GITHUB.WORKSPACE }}\**\backups\**\*
+              ${{ GITHUB.WORKSPACE }}\**\flyway.toml
+              ${{ GITHUB.WORKSPACE }}\**\Filter.scpf
 
   test:
     name: Deploy Test
@@ -127,7 +135,11 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: flyway-build-artifact-${{ github.run_number }}
+      - name: Display structure of downloaded files
+        run: ls -R
 
       - name: Flyway - CLI Install ManualValidation
         if: env.GITHUB_HOSTED_RUNNER == 'true'
@@ -197,7 +209,11 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: flyway-build-artifact-${{ github.run_number }}
+      - name: Display structure of downloaded files
+        run: ls -R
 
       - name: Flyway - CLI Install ManualValidation
         if: env.GITHUB_HOSTED_RUNNER == 'true'
