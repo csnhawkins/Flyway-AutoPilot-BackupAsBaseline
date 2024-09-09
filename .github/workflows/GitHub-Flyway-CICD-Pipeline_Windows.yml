@@ -103,6 +103,7 @@ jobs:
               !${{ GITHUB.WORKSPACE }}\.git*\**\*
               ${{ GITHUB.WORKSPACE }}\**\schema-model\**\*
               ${{ GITHUB.WORKSPACE }}\**\migrations\**\*
+              ${{ GITHUB.WORKSPACE }}\**\Scripts\**\*
               ${{ GITHUB.WORKSPACE }}\**\backups\**\*
               ${{ GITHUB.WORKSPACE }}\**\flyway.toml
               ${{ GITHUB.WORKSPACE }}\**\Filter.scpf
