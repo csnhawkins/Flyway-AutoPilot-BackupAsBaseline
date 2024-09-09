@@ -59,7 +59,7 @@ jobs:
             Write-Host "Script found. Running Flyway_DownloadAndInstallCLI.ps1..."
             & $scriptPath
             Write-Host "Updating PATH environment variable to include Flyway CLI Path"
-              Write-Host "##vso[task.prependpath]C:\FlywayCLI\flyway-$(FLYWAY_VERSION)"
+              Write-Host "C:\FlywayCLI\flyway-${{ env.FLYWAY_VERSION }}" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           } 
           else {
             Write-Host "Error: Script not found at path $scriptPath"
