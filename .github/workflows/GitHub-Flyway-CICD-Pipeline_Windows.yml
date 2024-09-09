@@ -102,7 +102,7 @@ jobs:
   test:
     name: Deploy Test
     # The type of runner that the job will run on
-    runs-on: ${{ env.RUNNER_VERSION }}
+    runs-on: "windows-latest"
     environment: 'test' #Ensure this environment name is setup in the projects Settings>Environment area. Ensuring any reviewers are also configFilesured 
     if: ${{ true }} #Set this variable to false to temporarily disable the job
     needs: build
@@ -157,7 +157,7 @@ jobs:
   prod:
     name: Deploy Prod
     # The type of runner that the job will run on
-    runs-on: ${{ env.RUNNER_VERSION }}
+    runs-on: "windows-latest"
     environment: 'prod' #Ensure this environment name is setup in the projects Settings>Environment area. Ensuring any reviewers are also configFilesured 
     if: ${{ true }} #Set this variable to false to temporarily disable the job
     needs: test
