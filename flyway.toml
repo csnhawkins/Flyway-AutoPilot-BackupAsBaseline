@@ -3,8 +3,7 @@ name = "FlywayTrialProject"
 databaseType = "SqlServer"
 
 [environments.development]
-url = "jdbc:sqlserver://localhost;databaseName=AutoPilotDev;encrypt=true;integratedSecurity=true;trustServerCertificate=true"
-schemas = [ ]
+url = "jdbc:sqlserver://azure-se-sql-database.database.windows.net;authentication=sqlPassword;databaseName=Eastwind_Dev;encrypt=true;trustServerCertificate=true"
 displayName = "Development database"
 
 [environments.shadow]
@@ -13,17 +12,17 @@ displayName = "Shadow database"
 provisioner = "clean"
 
 [environments.Prod]
-url = "jdbc:sqlserver://localhost;databaseName=AutoPilotProd;encrypt=true;integratedSecurity=true;trustServerCertificate=true"
+url = "jdbc:sqlserver://azure-se-sql-database.database.windows.net;authentication=sqlPassword;databaseName=Eastwind_Prod;encrypt=true;trustServerCertificate=true"
 displayName = "Production"
 
 [environments.Test]
-url = "jdbc:sqlserver://localhost;databaseName=AutoPilotTest;encrypt=true;integratedSecurity=true;trustServerCertificate=true"
+url = "jdbc:sqlserver://azure-se-sql-database.database.windows.net;authentication=sqlPassword;databaseName=Eastwind_Prod;encrypt=true;trustServerCertificate=true"
 
 [environments.Check]
-url = "jdbc:sqlserver://localhost;databaseName=AutoPilotCheck;encrypt=true;integratedSecurity=true;trustServerCertificate=true"
+url = "jdbc:sqlserver://azure-se-sql-database.database.windows.net;authentication=sqlPassword;databaseName=Eastwind_Prod;encrypt=true;trustServerCertificate=true"
 
 [environments.Build]
-url = "jdbc:sqlserver://localhost;databaseName=AutoPilotBuild;encrypt=true;integratedSecurity=true;trustServerCertificate=true"
+url = "jdbc:sqlserver://azure-se-sql-database.database.windows.net;authentication=sqlPassword;databaseName=Eastwind_Prod;encrypt=true;trustServerCertificate=true"
 
 [flyway]
 locations = [ "filesystem:migrations" ]
