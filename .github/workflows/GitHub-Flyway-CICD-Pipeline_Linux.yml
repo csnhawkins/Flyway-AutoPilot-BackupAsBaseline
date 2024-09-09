@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
  
-name: GitHub-Flyway-AutoPilot-Pipeline-Windows
+name: GitHub-Flyway-AutoPilot-Pipeline-Linux
 
 on:
   # Triggers the workflow on push or pull request events but only for the "release" branch
@@ -13,14 +13,12 @@ on:
   workflow_dispatch:
 env:
  
-  RUNNER_VERSION: "windows-latest" # Options are - self-hosted/ubuntu-latest/windows-latest (See here for more details on GitHub hosted runners - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners)
   FLYWAY_LICENSE_KEY: "FL01404B039A4F4E0AA0943C07036C69D32E234CE5B368E0DC906B1FF4F4D822B118C26BAF5D4FC6657A9BBA5B07FD5DA3E4F89C20D4C32329D76C9FCFAEFD73821D507F7D9DC42C77BF6EBE0E737616AF40CEDA8751B167FC8D11D9B81442AB1F581152839C213774CA55022269B632573CE9105E397AED927630523D0DA476E36F16622ED6FF34ACC92E5F376536F085C54FCACFFFAFF29C338CB8573651219D8623B3712385FC632BFC1B5D230E8B1673C476615B4F48825EADD82F3CC2374BB7C85BB6357CBD30D09D12F44A963918E596B56532AE3C2A895F6978EBB296B327EFF9EE1435283FC059086C85F0FFDB09385EB475779D6E2FF195F3A7E8D1113E" #Repository Secret - Create this within the Projects Settings > Secrects > Actions section
   # If the first undo script is U002, this will validate all undo scripts up to and including that
   BASELINE_VERSION: "001" # This should match the version number of your baseline script
   FIRST_UNDO_SCRIPT: "002"
   # Enable this for additional debug logging
   ACTIONS_RUNNER_DEBUG: false
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: true # For security purposes, this is set to true to enable latest Node20 version
 
   # Optional - For Microsoft Hosted Agents, it's necessary to ensure Flyway is installed on each run. Therefore, the below variables are required
   GITHUB_HOSTED_RUNNER: "true" # Setting to false will skip the Flyway CLI check step
@@ -32,7 +30,7 @@ jobs:
   build:
     name: Deploy Build
     # The type of runner that the job will run on
-    runs-on: "windows-latest" # Options - self-hosted/ubuntu-latest/windows-latest (See here for more details on GitHub hosted runners - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners)
+    runs-on: "ubuntu-latest" # Options - self-hosted/ubuntu-latest/windows-latest (See here for more details on GitHub hosted runners - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners)
     environment: 'build' #Ensure this environment name is setup in the projects Settings>Environment area. Ensuring any reviewers are also configFilesured 
     env:
       stage: 'Build'
@@ -55,35 +53,30 @@ jobs:
       - name: Flyway - CLI Install ManualValidation
         if: env.GITHUB_HOSTED_RUNNER == 'true'
         run: |
-          $scriptPath = "${{ GITHUB.WORKSPACE }}/scripts/Flyway_DownloadAndInstallCLI.ps1"
-          if (Test-Path $scriptPath) {
-            Write-Host "Script found. Running Flyway_DownloadAndInstallCLI.ps1..."
-            & $scriptPath
-            Write-Host "Updating PATH environment variable to include Flyway CLI Path"
-              echo "C:\FlywayCLI\flyway-${{ env.FLYWAY_VERSION }}" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          } 
-          else {
-            Write-Host "Error: Script not found at path $scriptPath"
-            exit 1
-          }
+          if flyway --help ; then
+              ech "Flyway Installed and Available"
+            else 
+              echo "Flyway Not Installed - Downloading and Configuring Now"
+              wget -qO- https://download.red-gate.com/maven/release/com/redgate/flyway/flyway-commandline/$(FLYWAY_VERSION)/flyway-commandline-$(FLYWAY_VERSION)-linux-x64.tar.gz | tar -xvz && sudo ln -s `pwd`/flyway-$(FLYWAY_VERSION)/flyway /usr/local/bin 
+            fi
       
       # Runs the Flyway Clean command against the Build database
       - name: Clean Build DB
         if: env.executeBuild == 'true'
         run: |
-          flyway info clean info -environment="${{ env.ENVIRONMENT }}" -user="${{ env.TARGET_DATABASE_USERNAME }}" -password="${{ env.TARGET_DATABASE_PASSWORD }}" -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}" -configFiles="${{ GITHUB.WORKSPACE }}\flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}\migrations" -cleanDisabled='false' "-plugins.clean.mode=all"
+          flyway info clean info -environment="${{ env.ENVIRONMENT }}" -user="${{ env.TARGET_DATABASE_USERNAME }}" -password="${{ env.TARGET_DATABASE_PASSWORD }}" -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}" -configFiles="${{ GITHUB.WORKSPACE }}/flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}/migrations" -cleanDisabled='false' "-plugins.clean.mode=all"
         
       # Runs the Flyway Migrate command against the Build database
       - name: Migrate Build DB
         if: env.executeBuild == 'true'
         run: |
-          flyway info migrate info -environment="${{ env.ENVIRONMENT }}" -user="${{ env.TARGET_DATABASE_USERNAME }}" -password="${{ env.TARGET_DATABASE_PASSWORD }}" -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}" -configFiles="${{ GITHUB.WORKSPACE }}\flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}\migrations" -cleanDisabled='false' -baselineOnMigrate="true"
+          flyway info migrate info -environment="${{ env.ENVIRONMENT }}" -user="${{ env.TARGET_DATABASE_USERNAME }}" -password="${{ env.TARGET_DATABASE_PASSWORD }}" -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}" -configFiles="${{ GITHUB.WORKSPACE }}/flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}/migrations" -cleanDisabled='false' -baselineOnMigrate="true"
           
       # Runs the Flyway Undo command against the Build database
       - name: undo Build DB
         if: env.executeBuild == 'true'
         run: |
-          flyway info undo info -environment="${{ env.ENVIRONMENT }}" -user=${{ env.TARGET_DATABASE_USERNAME }} -password=${{ env.TARGET_DATABASE_PASSWORD }} -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}" -configFiles="${{ GITHUB.WORKSPACE }}\flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}\migrations" -baselineOnMigrate="true" -cleanDisabled='false' -target="${{ env.FIRST_UNDO_SCRIPT }}"
+          flyway info undo info -environment="${{ env.ENVIRONMENT }}" -user=${{ env.TARGET_DATABASE_USERNAME }} -password=${{ env.TARGET_DATABASE_PASSWORD }} -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}" -configFiles="${{ GITHUB.WORKSPACE }}/flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}/migrations" -baselineOnMigrate="true" -cleanDisabled='false' -target="${{ env.FIRST_UNDO_SCRIPT }}"
  
        # Create a directory to stage the artifact files
       - name: Stage files for publishing
@@ -133,30 +126,25 @@ jobs:
       - name: Flyway - CLI Install ManualValidation
         if: env.GITHUB_HOSTED_RUNNER == 'true'
         run: |
-          $scriptPath = "${{ GITHUB.WORKSPACE }}/scripts/Flyway_DownloadAndInstallCLI.ps1"
-          if (Test-Path $scriptPath) {
-            Write-Host "Script found. Running Flyway_DownloadAndInstallCLI.ps1..."
-            & $scriptPath
-            Write-Host "Updating PATH environment variable to include Flyway CLI Path"
-              echo "C:\FlywayCLI\flyway-${{ env.FLYWAY_VERSION }}" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          } 
-          else {
-            Write-Host "Error: Script not found at path $scriptPath"
-            exit 1
-          }
+          if flyway --help ; then
+              ech "Flyway Installed and Available"
+            else 
+              echo "Flyway Not Installed - Downloading and Configuring Now"
+              wget -qO- https://download.red-gate.com/maven/release/com/redgate/flyway/flyway-commandline/$(FLYWAY_VERSION)/flyway-commandline-$(FLYWAY_VERSION)-linux-x64.tar.gz | tar -xvz && sudo ln -s `pwd`/flyway-$(FLYWAY_VERSION)/flyway /usr/local/bin 
+            fi
 
        # Runs the Flyway Check command, to produce a deployment report, against the Production database
       - name: Create Check Reports
         if: env.generateDriftAndChangeReport == 'true'
         run: |
-          flyway check -dryrun -changes -drift -environment="${{ env.ENVIRONMENT }}" -user=${{ env.TARGET_DATABASE_USERNAME }} -password=${{ env.TARGET_DATABASE_PASSWORD }} -configFiles="${{ GITHUB.WORKSPACE }}\flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}\migrations" "-check.failOnDrift=${{ env.failReleaseIfDriftDetected }}" "-check.buildEnvironment=${{ env.CHECK_ENVIRONMENT }}" "-environments.${{ env.CHECK_ENVIRONMENT }}.user=${{ env.CHECK_DATABASE_USERNAME }}" "-environments.${{ env.CHECK_ENVIRONMENT }}.password=${{ env.CHECK_DATABASE_PASSWORD }}" "-reportFilename=${{ GITHUB.WORKSPACE }}\reports\${{ env.databaseName }}-Run-${{ GITHUB.RUN_ID }}-${{ env.ENVIRONMENT }}-Check-Report.html" -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}"
+          flyway check -dryrun -changes -drift -environment="${{ env.ENVIRONMENT }}" -user=${{ env.TARGET_DATABASE_USERNAME }} -password=${{ env.TARGET_DATABASE_PASSWORD }} -configFiles="${{ GITHUB.WORKSPACE }}/flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}/migrations" "-check.failOnDrift=${{ env.failReleaseIfDriftDetected }}" "-check.buildEnvironment=${{ env.CHECK_ENVIRONMENT }}" "-environments.${{ env.CHECK_ENVIRONMENT }}.user=${{ env.CHECK_DATABASE_USERNAME }}" "-environments.${{ env.CHECK_ENVIRONMENT }}.password=${{ env.CHECK_DATABASE_PASSWORD }}" "-reportFilename=${{ GITHUB.WORKSPACE }}/reports/${{ env.databaseName }}-Run-${{ GITHUB.RUN_ID }}-${{ env.ENVIRONMENT }}-Check-Report.html" -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}"
         continue-on-error: true
 
         # Create a directory to stage the artifact files
       - name: Stage files for publishing
         if: env.publishArtifacts == 'true'
         run: |
-          cp -R ${{ GITHUB.WORKSPACE }}\reports Artifact_Files/Reports/
+          cp -R ${{ GITHUB.WORKSPACE }}/reports Artifact_Files/Reports/
 
       - name: Publish Check Report as Artifact
         uses: actions/upload-artifact@v4
@@ -168,7 +156,7 @@ jobs:
       - name: Migrate Build DB
         if: ${{ true }}
         run: |
-          flyway info migrate info -environment="${{ env.ENVIRONMENT }}" -user="${{ env.TARGET_DATABASE_USERNAME }}" -password="${{ env.TARGET_DATABASE_PASSWORD }}" -baselineOnMigrate="true" -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}" -configFiles="${{ GITHUB.WORKSPACE }}\flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}\migrations"
+          flyway info migrate info -environment="${{ env.ENVIRONMENT }}" -user="${{ env.TARGET_DATABASE_USERNAME }}" -password="${{ env.TARGET_DATABASE_PASSWORD }}" -baselineOnMigrate="true" -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}" -configFiles="${{ GITHUB.WORKSPACE }}/flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}/migrations"
 
   prod:
     name: Deploy Prod
@@ -203,30 +191,25 @@ jobs:
       - name: Flyway - CLI Install ManualValidation
         if: env.GITHUB_HOSTED_RUNNER == 'true'
         run: |
-          $scriptPath = "${{ GITHUB.WORKSPACE }}/scripts/Flyway_DownloadAndInstallCLI.ps1"
-          if (Test-Path $scriptPath) {
-            Write-Host "Script found. Running Flyway_DownloadAndInstallCLI.ps1..."
-            & $scriptPath
-            Write-Host "Updating PATH environment variable to include Flyway CLI Path"
-              echo "C:\FlywayCLI\flyway-${{ env.FLYWAY_VERSION }}" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          } 
-          else {
-            Write-Host "Error: Script not found at path $scriptPath"
-            exit 1
-          }
+          if flyway --help ; then
+              ech "Flyway Installed and Available"
+            else 
+              echo "Flyway Not Installed - Downloading and Configuring Now"
+              wget -qO- https://download.red-gate.com/maven/release/com/redgate/flyway/flyway-commandline/$(FLYWAY_VERSION)/flyway-commandline-$(FLYWAY_VERSION)-linux-x64.tar.gz | tar -xvz && sudo ln -s `pwd`/flyway-$(FLYWAY_VERSION)/flyway /usr/local/bin 
+            fi
 
        # Runs the Flyway Check command, to produce a deployment report, against the Production database
       - name: Create Check Reports
         if: env.generateDriftAndChangeReport == 'true'
         run: |
-          flyway check -dryrun -changes -drift -environment="${{ env.ENVIRONMENT }}" -user=${{ env.TARGET_DATABASE_USERNAME }} -password=${{ env.TARGET_DATABASE_PASSWORD }} -configFiles="${{ GITHUB.WORKSPACE }}\flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}\migrations" "-check.failOnDrift=${{ env.failReleaseIfDriftDetected }}" "-check.buildEnvironment=${{ env.CHECK_ENVIRONMENT }}" "-environments.${{ env.CHECK_ENVIRONMENT }}.user=${{ env.CHECK_DATABASE_USERNAME }}" "-environments.${{ env.CHECK_ENVIRONMENT }}.password=${{ env.CHECK_DATABASE_PASSWORD }}" "-reportFilename=${{ GITHUB.WORKSPACE }}\reports\${{ env.databaseName }}-Run-${{ GITHUB.RUN_ID }}-${{ env.ENVIRONMENT }}-Check-Report.html" -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}"
+          flyway check -dryrun -changes -drift -environment="${{ env.ENVIRONMENT }}" -user=${{ env.TARGET_DATABASE_USERNAME }} -password=${{ env.TARGET_DATABASE_PASSWORD }} -configFiles="${{ GITHUB.WORKSPACE }}/flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}/migrations" "-check.failOnDrift=${{ env.failReleaseIfDriftDetected }}" "-check.buildEnvironment=${{ env.CHECK_ENVIRONMENT }}" "-environments.${{ env.CHECK_ENVIRONMENT }}.user=${{ env.CHECK_DATABASE_USERNAME }}" "-environments.${{ env.CHECK_ENVIRONMENT }}.password=${{ env.CHECK_DATABASE_PASSWORD }}" "-reportFilename=${{ GITHUB.WORKSPACE }}/reports/${{ env.databaseName }}-Run-${{ GITHUB.RUN_ID }}-${{ env.ENVIRONMENT }}-Check-Report.html" -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}"
         continue-on-error: true
 
         # Create a directory to stage the artifact files
       - name: Stage files for publishing
         if: env.publishArtifacts == 'true'
         run: |
-          cp -R ${{ GITHUB.WORKSPACE }}\reports Artifact_Files/Reports/
+          cp -R ${{ GITHUB.WORKSPACE }}/reports Artifact_Files/Reports/
 
       - name: Publish Check Report as Artifact
         uses: actions/upload-artifact@v4
@@ -238,4 +221,4 @@ jobs:
       - name: Migrate Build DB
         if: ${{ true }}
         run: |
-          flyway info migrate info -environment="${{ env.ENVIRONMENT }}" -user="${{ env.TARGET_DATABASE_USERNAME }}" -password="${{ env.TARGET_DATABASE_PASSWORD }}" -baselineOnMigrate="true" -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}" -configFiles="${{ GITHUB.WORKSPACE }}\flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}\migrations"
+          flyway info migrate info -environment="${{ env.ENVIRONMENT }}" -user="${{ env.TARGET_DATABASE_USERNAME }}" -password="${{ env.TARGET_DATABASE_PASSWORD }}" -baselineOnMigrate="true" -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}" -configFiles="${{ GITHUB.WORKSPACE }}/flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}/migrations"
