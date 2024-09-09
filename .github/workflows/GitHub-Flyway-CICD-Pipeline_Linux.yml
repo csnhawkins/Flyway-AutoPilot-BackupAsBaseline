@@ -78,11 +78,11 @@ jobs:
         run: |
           flyway info undo info -environment="${{ env.ENVIRONMENT }}" -user=${{ env.TARGET_DATABASE_USERNAME }} -password=${{ env.TARGET_DATABASE_PASSWORD }} -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}" -configFiles="${{ GITHUB.WORKSPACE }}/flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}/migrations" -baselineOnMigrate="true" -cleanDisabled='false' -target="${{ env.FIRST_UNDO_SCRIPT }}"
  
-       # Create a directory to stage the artifact files
-      - name: Stage files for publishing
-        if: env.publishArtifacts == 'true'
-        run: |
-          cp -R ${{ GITHUB.WORKSPACE }}/migrations Artifact_Files/Migration/
+      #  # Create a directory to stage the artifact files
+      # - name: Stage files for publishing
+      #   if: env.publishArtifacts == 'true'
+      #   run: |
+      #     cp -R ${{ GITHUB.WORKSPACE }}/migrations ${{ GITHUB.WORKSPACE }}/Artifact_Files/Migration/
  
       
       #After migration scripts are validated, publish them as an artifact
@@ -91,7 +91,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with: 
           name: flyway-build-artifact
-          path: Artifact_Files/Migration/
+          path: ${{ GITHUB.WORKSPACE }}
 
   test:
     name: Deploy Test
