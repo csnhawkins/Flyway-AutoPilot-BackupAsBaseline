@@ -40,8 +40,8 @@ jobs:
       # Environment Secrets - In a Production setup, Ensure all of the below have been created as an Environment Secret (Projects Settings > Secrets > Actions section, specially related to the environment in question) #
       DATABASE_NAME: "AutoPilotBuild"
       ENVIRONMENT: "Build" # This variable refers to the environment name present in the Flyway Projects TOML file. Use Flyway Desktop to check and change this value if required.
-      TARGET_DATABASE_USERNAME : "user" # If using SQL Authentication, make sure to populate these fields!
-      TARGET_DATABASE_PASSWORD : "pass" # If using SQL Authentication, make sure to populate these fields!
+      TARGET_DATABASE_USERNAME : "Redgate" # If using SQL Authentication, make sure to populate these fields!
+      TARGET_DATABASE_PASSWORD : "Redg@te1" # If using SQL Authentication, make sure to populate these fields!
 
       displayName: 'Build'
       executeBuild: true
@@ -112,12 +112,12 @@ jobs:
       DATABASE_NAME: "AutoPilotTest"
 
       ENVIRONMENT: "Test" # This variable refers to the environment name present in the Flyway Projects TOML file. Use Flyway Desktop to check and change this value if required.
-      TARGET_DATABASE_USERNAME : "user" # If using SQL Authentication, make sure to populate these fields!
-      TARGET_DATABASE_PASSWORD : "pass" # If using SQL Authentication, make sure to populate these fields!
+      TARGET_DATABASE_USERNAME : "Redgate" # If using SQL Authentication, make sure to populate these fields!
+      TARGET_DATABASE_PASSWORD : "Redg@te1" # If using SQL Authentication, make sure to populate these fields!
 
       CHECK_ENVIRONMENT: "Check" # This variable refers to the environment name present in the Flyway Projects TOML file. Use Flyway Desktop to check and change this value if required.
-      CHECK_DATABASE_USERNAME : "user" # If using SQL Authentication, make sure to populate these fields!
-      CHECK_DATABASE_PASSWORD : "pass" # If using SQL Authentication, make sure to populate these fields!
+      CHECK_DATABASE_USERNAME : "Redgate" # If using SQL Authentication, make sure to populate these fields!
+      CHECK_DATABASE_PASSWORD : "Redg@te1" # If using SQL Authentication, make sure to populate these fields!
       # End of Environment Secrets #
       generateDriftAndChangeReport: true
       failReleaseIfDriftDetected: false
@@ -167,12 +167,12 @@ jobs:
       DATABASE_NAME: "AutoPilotProd"
 
       ENVIRONMENT: "Prod"  # This variable refers to the environment name present in the Flyway Projects TOML file. Use Flyway Desktop to check and change this value if required.
-      TARGET_DATABASE_USERNAME : "user" # If using SQL Authentication, make sure to populate these fields!
-      TARGET_DATABASE_PASSWORD : "pass" # If using SQL Authentication, make sure to populate these fields!
+      TARGET_DATABASE_USERNAME : "Redgate" # If using SQL Authentication, make sure to populate these fields!
+      TARGET_DATABASE_PASSWORD : "Redg@te1" # If using SQL Authentication, make sure to populate these fields!
 
       CHECK_ENVIRONMENT: "Check" # This variable refers to the environment name present in the Flyway Projects TOML file. Use Flyway Desktop to check and change this value if required.
-      CHECK_DATABASE_USERNAME : "user" # If using SQL Authentication, make sure to populate these fields!
-      CHECK_DATABASE_PASSWORD : "pass" # If using SQL Authentication, make sure to populate these fields!
+      CHECK_DATABASE_USERNAME : "Redgate" # If using SQL Authentication, make sure to populate these fields!
+      CHECK_DATABASE_PASSWORD : "Redg@te1" # If using SQL Authentication, make sure to populate these fields!
       # End of Environment Secrets #
       generateDriftAndChangeReport: true
       failReleaseIfDriftDetected: false
