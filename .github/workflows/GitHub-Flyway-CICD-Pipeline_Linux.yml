@@ -57,7 +57,7 @@ jobs:
               ech "Flyway Installed and Available"
             else 
               echo "Flyway Not Installed - Downloading and Configuring Now"
-              wget -qO- https://download.red-gate.com/maven/release/com/redgate/flyway/flyway-commandline/$(FLYWAY_VERSION)/flyway-commandline-$(FLYWAY_VERSION)-linux-x64.tar.gz | tar -xvz && sudo ln -s `pwd`/flyway-$(FLYWAY_VERSION)/flyway /usr/local/bin 
+              wget -qO- https://download.red-gate.com/maven/release/com/redgate/flyway/flyway-commandline/${{ env.FLYWAY_VERSION }}/flyway-commandline-${{ env.FLYWAY_VERSION }}-linux-x64.tar.gz | tar -xvz && sudo ln -s `pwd`/flyway-${{ env.FLYWAY_VERSION }}/flyway /usr/local/bin 
             fi
       
       # Runs the Flyway Clean command against the Build database
@@ -130,7 +130,7 @@ jobs:
               ech "Flyway Installed and Available"
             else 
               echo "Flyway Not Installed - Downloading and Configuring Now"
-              wget -qO- https://download.red-gate.com/maven/release/com/redgate/flyway/flyway-commandline/$(FLYWAY_VERSION)/flyway-commandline-$(FLYWAY_VERSION)-linux-x64.tar.gz | tar -xvz && sudo ln -s `pwd`/flyway-$(FLYWAY_VERSION)/flyway /usr/local/bin 
+              wget -qO- https://download.red-gate.com/maven/release/com/redgate/flyway/flyway-commandline/${{ env.FLYWAY_VERSION }}/flyway-commandline-${{ env.FLYWAY_VERSION }}-linux-x64.tar.gz | tar -xvz && sudo ln -s `pwd`/flyway-${{ env.FLYWAY_VERSION }}/flyway /usr/local/bin 
             fi
 
        # Runs the Flyway Check command, to produce a deployment report, against the Production database
@@ -195,7 +195,7 @@ jobs:
               ech "Flyway Installed and Available"
             else 
               echo "Flyway Not Installed - Downloading and Configuring Now"
-              wget -qO- https://download.red-gate.com/maven/release/com/redgate/flyway/flyway-commandline/$(FLYWAY_VERSION)/flyway-commandline-$(FLYWAY_VERSION)-linux-x64.tar.gz | tar -xvz && sudo ln -s `pwd`/flyway-$(FLYWAY_VERSION)/flyway /usr/local/bin 
+              wget -qO- https://download.red-gate.com/maven/release/com/redgate/flyway/flyway-commandline/${{ env.FLYWAY_VERSION }}/flyway-commandline-${{ env.FLYWAY_VERSION }}-linux-x64.tar.gz | tar -xvz && sudo ln -s `pwd`/flyway-${{ env.FLYWAY_VERSION }}/flyway /usr/local/bin 
             fi
 
        # Runs the Flyway Check command, to produce a deployment report, against the Production database
