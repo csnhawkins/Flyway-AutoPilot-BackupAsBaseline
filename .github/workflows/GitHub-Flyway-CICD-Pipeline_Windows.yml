@@ -32,7 +32,7 @@ jobs:
   build:
     name: Deploy Build
     # The type of runner that the job will run on
-    runs-on: "windows-latest"
+    runs-on: "windows-latest" # Options - self-hosted/ubuntu-latest/windows-latest (See here for more details on GitHub hosted runners - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners)
     environment: 'build' #Ensure this environment name is setup in the projects Settings>Environment area. Ensuring any reviewers are also configFilesured 
     env:
       stage: 'Build'
@@ -103,7 +103,7 @@ jobs:
   test:
     name: Deploy Test
     # The type of runner that the job will run on
-    runs-on: "windows-latest"
+    runs-on: "windows-latest" # Options - self-hosted/ubuntu-latest/windows-latest (See here for more details on GitHub hosted runners - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners)
     environment: 'test' #Ensure this environment name is setup in the projects Settings>Environment area. Ensuring any reviewers are also configFilesured 
     if: ${{ true }} #Set this variable to false to temporarily disable the job
     needs: build
@@ -149,7 +149,7 @@ jobs:
       - name: Create Check Reports
         if: env.generateDriftAndChangeReport == 'true'
         run: |
-          flyway check -dryrun -changes -drift -environment="${{ env.ENVIRONMENT }}" -user=${{ env.TARGET_DATABASE_USERNAME }} -password=${{ env.TARGET_DATABASE_PASSWORD }} -configFiles="${{ GITHUB.WORKSPACE }}\flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}\migrations" "-check.failOnDrift=${{ env.failReleaseIfDriftDetected }}" "-check.buildEnvironment=${{ env.CHECK_ENVIRONMENT }}" "-check.buildUser=${{ env.CHECK_USERNAME }}" "-check.buildPassword=${{ env.CHECK_PASSWORD }}" "-reportFilename=${{ GITHUB.WORKSPACE }}\reports\${{ env.databaseName }}-Run-${{ GITHUB.RUN_ID }}-${{ env.ENVIRONMENT }}-Check-Report.html" -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}"
+          flyway check -dryrun -changes -drift -environment="${{ env.ENVIRONMENT }}" -user=${{ env.TARGET_DATABASE_USERNAME }} -password=${{ env.TARGET_DATABASE_PASSWORD }} -configFiles="${{ GITHUB.WORKSPACE }}\flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}\migrations" "-check.failOnDrift=${{ env.failReleaseIfDriftDetected }}" "-check.buildEnvironment=${{ env.CHECK_ENVIRONMENT }}" "-environments.${{ env.CHECK_ENVIRONMENT }}.user=${{ env.CHECK_DATABASE_USERNAME }}" "-environments.${{ env.CHECK_ENVIRONMENT }}.password=${{ env.CHECK_DATABASE_PASSWORD }}" "-reportFilename=${{ GITHUB.WORKSPACE }}\reports\${{ env.databaseName }}-Run-${{ GITHUB.RUN_ID }}-${{ env.ENVIRONMENT }}-Check-Report.html" -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}"
         continue-on-error: true
 
         # Create a directory to stage the artifact files
@@ -173,7 +173,7 @@ jobs:
   prod:
     name: Deploy Prod
     # The type of runner that the job will run on
-    runs-on: "windows-latest"
+    runs-on: "windows-latest" # Options - self-hosted/ubuntu-latest/windows-latest (See here for more details on GitHub hosted runners - https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners)
     environment: 'prod' #Ensure this environment name is setup in the projects Settings>Environment area. Ensuring any reviewers are also configFilesured 
     if: ${{ true }} #Set this variable to false to temporarily disable the job
     needs: test
@@ -219,7 +219,7 @@ jobs:
       - name: Create Check Reports
         if: env.generateDriftAndChangeReport == 'true'
         run: |
-          flyway check -dryrun -changes -drift -environment="${{ env.ENVIRONMENT }}" -user=${{ env.TARGET_DATABASE_USERNAME }} -password=${{ env.TARGET_DATABASE_PASSWORD }} -configFiles="${{ GITHUB.WORKSPACE }}\flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}\migrations" "-check.failOnDrift=${{ env.failReleaseIfDriftDetected }}" "-check.buildEnvironment=${{ env.CHECK_ENVIRONMENT }}" "-check.buildUser=${{ env.CHECK_USERNAME }}" "-check.buildPassword=${{ env.CHECK_PASSWORD }}" "-reportFilename=${{ GITHUB.WORKSPACE }}\reports\${{ env.databaseName }}-Run-${{ GITHUB.RUN_ID }}-${{ env.ENVIRONMENT }}-Check-Report.html" -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}"
+          flyway check -dryrun -changes -drift -environment="${{ env.ENVIRONMENT }}" -user=${{ env.TARGET_DATABASE_USERNAME }} -password=${{ env.TARGET_DATABASE_PASSWORD }} -configFiles="${{ GITHUB.WORKSPACE }}\flyway.toml" -locations="filesystem:${{ GITHUB.WORKSPACE }}\migrations" "-check.failOnDrift=${{ env.failReleaseIfDriftDetected }}" "-check.buildEnvironment=${{ env.CHECK_ENVIRONMENT }}" "-environments.${{ env.CHECK_ENVIRONMENT }}.user=${{ env.CHECK_DATABASE_USERNAME }}" "-environments.${{ env.CHECK_ENVIRONMENT }}.password=${{ env.CHECK_DATABASE_PASSWORD }}" "-reportFilename=${{ GITHUB.WORKSPACE }}\reports\${{ env.databaseName }}-Run-${{ GITHUB.RUN_ID }}-${{ env.ENVIRONMENT }}-Check-Report.html" -licenseKey="${{ env.FLYWAY_LICENSE_KEY }}"
         continue-on-error: true
 
         # Create a directory to stage the artifact files
