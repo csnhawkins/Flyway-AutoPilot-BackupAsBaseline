@@ -42,7 +42,7 @@ jobs:
       TARGET_DATABASE_PASSWORD : "Redg@te1" # If using SQL Authentication, make sure to populate these fields!
 
       displayName: 'Build'
-      executeBuild: true
+      executeBuild: false
       publishArtifacts: true
  
     # Steps represent a sequence of tasks that will be executed as part of the job
