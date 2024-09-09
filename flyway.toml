@@ -16,13 +16,13 @@ url = "jdbc:sqlserver://azure-se-sql-database.database.windows.net;authenticatio
 displayName = "Production"
 
 [environments.Test]
-url = "jdbc:sqlserver://azure-se-sql-database.database.windows.net;authentication=sqlPassword;databaseName=Eastwind_Prod;encrypt=true;trustServerCertificate=true"
+url = "jdbc:sqlserver://azure-se-sql-database.database.windows.net;authentication=sqlPassword;databaseName=Eastwind_Test;encrypt=true;trustServerCertificate=true"
 
 [environments.Check]
-url = "jdbc:sqlserver://azure-se-sql-database.database.windows.net;authentication=sqlPassword;databaseName=Eastwind_Prod;encrypt=true;trustServerCertificate=true"
+url = "jdbc:sqlserver://azure-se-sql-database.database.windows.net;authentication=sqlPassword;databaseName=Eastwind_Build;encrypt=true;trustServerCertificate=true"
 
 [environments.Build]
-url = "jdbc:sqlserver://azure-se-sql-database.database.windows.net;authentication=sqlPassword;databaseName=Eastwind_Prod;encrypt=true;trustServerCertificate=true"
+url = "jdbc:sqlserver://azure-se-sql-database.database.windows.net;authentication=sqlPassword;databaseName=Eastwind_Build;encrypt=true;trustServerCertificate=true"
 
 [flyway]
 locations = [ "filesystem:migrations" ]
